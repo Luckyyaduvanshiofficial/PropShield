@@ -5,12 +5,14 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { AppConfig } from '@/constants/config';
+import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { signIn, signInWithGithub } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,13 +25,24 @@ export default function LoginScreen() {
 
     setLoading(true);
     
-    // Mock login - replace with actual Supabase auth
-    setTimeout(() => {
-      setLoading(false);
-      Alert.alert('Success', 'Login successful!', [
-        { text: 'OK', onPress: () => router.replace('/(tabs)') }
-      ]);
-    }, 1000);
+    const { error } = await signIn(email, password);
+    setLoading(false);
+    
+    if (error) {
+      Alert.alert('Error', error.message || 'Failed to sign in');
+    } else {
+      router.replace('/(tabs)');
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    setLoading(true);
+    const { error } = await signInWithGithub();
+    setLoading(false);
+    
+    if (error) {
+      Alert.alert('Error', error.message || 'Failed to sign in with GitHub');
+    }
   };
 
   return (
@@ -104,12 +117,17 @@ export default function LoginScreen() {
             </View>
 
             <Pressable
-              style={styles.socialButton}
-              onPress={() => Alert.alert('Coming Soon', 'Google Sign-In will be available soon')}
+              style={[styles.socialButton, styles.githubButton]}
+              onPress={handleGithubLogin}
+              disabled={loading}
             >
-              <ThemedText style={styles.socialButtonText}>
-                🔵 Continue with Google
-              </ThemedText>
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <ThemedText style={styles.githubButtonText}>
+                  ⚫ Continue with GitHub
+                </ThemedText>
+              )}
             </Pressable>
 
             <View style={styles.footer}>
@@ -226,6 +244,15 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
   },
   socialButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  githubButton: {
+    backgroundColor: '#24292e',
+    borderColor: '#24292e',
+  },
+  githubButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },

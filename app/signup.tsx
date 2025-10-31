@@ -5,12 +5,14 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { AppConfig } from '@/constants/config';
+import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 export default function SignUpScreen() {
   const router = useRouter();
+  const { signUp, signInWithGithub } = useAuth();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,13 +37,28 @@ export default function SignUpScreen() {
 
     setLoading(true);
     
-    // Mock signup - replace with actual Supabase auth
-    setTimeout(() => {
-      setLoading(false);
-      Alert.alert('Success', 'Account created successfully!', [
-        { text: 'OK', onPress: () => router.replace('/(tabs)') }
-      ]);
-    }, 1000);
+    const { error } = await signUp(email, password, fullName);
+    setLoading(false);
+    
+    if (error) {
+      Alert.alert('Error', error.message || 'Failed to create account');
+    } else {
+      Alert.alert(
+        'Success',
+        'Account created! Please check your email to verify your account.',
+        [{ text: 'OK', onPress: () => router.replace('/login') }]
+      );
+    }
+  };
+
+  const handleGithubSignUp = async () => {
+    setLoading(true);
+    const { error } = await signInWithGithub();
+    setLoading(false);
+    
+    if (error) {
+      Alert.alert('Error', error.message || 'Failed to sign up with GitHub');
+    }
   };
 
   return (
@@ -119,6 +136,22 @@ export default function SignUpScreen() {
             >
               <ThemedText style={styles.buttonText}>
                 {loading ? 'Creating Account...' : 'Sign Up'}
+              </ThemedText>
+            </Pressable>
+
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <ThemedText style={styles.dividerText}>or</ThemedText>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <Pressable
+              style={[styles.socialButton, styles.githubButton]}
+              onPress={handleGithubSignUp}
+              disabled={loading}
+            >
+              <ThemedText style={styles.githubButtonText}>
+                ⚫ Continue with GitHub
               </ThemedText>
             </Pressable>
 
@@ -207,6 +240,38 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E0E0E0',
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    opacity: 0.5,
+  },
+  socialButton: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    marginBottom: 16,
+  },
+  githubButton: {
+    backgroundColor: '#24292e',
+    borderColor: '#24292e',
+  },
+  githubButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   terms: {
     marginBottom: 24,
