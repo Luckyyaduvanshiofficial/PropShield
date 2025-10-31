@@ -1,0 +1,13 @@
+{
+	"servers": {
+		"Supabase MCP": {
+			"url": "https://mcp.supabase.com/mcp",
+			"type": "http"
+		},
+		"context7-mcp": {
+			"url": "https://mcp.context7.com/mcp",
+			"type": "http"
+		}
+	},
+	"inputs": []
+}

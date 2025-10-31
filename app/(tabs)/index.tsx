@@ -24,7 +24,7 @@ export default function HomeScreen() {
         <View style={styles.quickActions}>
           <Pressable 
             style={styles.ctaCard}
-            onPress={() => router.push('/upload-document')}
+            onPress={() => router.push('/upload' as any)}
           >
             <View style={styles.ctaIcon}>
               <ThemedText style={styles.ctaIconText}>📄</ThemedText>

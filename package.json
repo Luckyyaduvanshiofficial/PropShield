@@ -6,12 +6,12 @@
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
-    "start": "expo start",
-    "start:clear": "expo start --clear",
+    "start": "cross-env NODE_OPTIONS='--max-old-space-size=8192' expo start",
+    "start:clear": "cross-env NODE_OPTIONS='--max-old-space-size=8192' expo start --clear",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
+    "android": "cross-env NODE_OPTIONS='--max-old-space-size=8192' expo start --android",
+    "ios": "cross-env NODE_OPTIONS='--max-old-space-size=8192' expo start --ios",
+    "web": "cross-env NODE_OPTIONS='--max-old-space-size=8192' expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "test": "echo \"No tests yet\" && exit 0",
@@ -31,6 +31,7 @@
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
     "@supabase/supabase-js": "^2.78.0",
+    "base64-arraybuffer": "^1.0.2",
     "expo": "~54.0.10",
     "expo-camera": "~17.0.8",
     "expo-constants": "~18.0.9",
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "cross-env": "^10.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "typescript": "~5.9.2"
